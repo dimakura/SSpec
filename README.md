@@ -1,3 +1,3 @@
 # SSpec
 
-SSpec is an expectations testing tool for Swift.
+Behavior driven development in Swift.
