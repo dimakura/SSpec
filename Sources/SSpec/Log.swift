@@ -19,8 +19,16 @@ func logWelcome() {
 
 /// Report on goodbuy.
 func logGoodbye() {
-  // TODO: display some stats
   if isLowestLevel() {
+    var summary: String = "\(examplesCount) example(s)"
+
+    if failuresCount > 0 {
+      summary += ", " + "\(failuresCount) failure(s)".red.bold
+    } else {
+      summary += " OK".green
+    }
+
+    print("\nSummary: \(summary)")
     print("\n-- Bye!\n")
   }
 }
