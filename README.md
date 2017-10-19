@@ -2,6 +2,7 @@
 
 Behavior driven development in Swift.
 
+[![Build Status](https://travis-ci.org/dimakura/SSpec.svg?branch=master)](https://travis-ci.org/dimakura/SSpec)
 
 ## Example
 
