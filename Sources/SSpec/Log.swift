@@ -1,13 +1,18 @@
-/// Single level indent.
-fileprivate let singleIndent = "  "
+//
+// SSpec
+// Log.swift
+//
+// Created by Dimitri Kurashvili on 2017-10-20
+//
+// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
+//
 
 
 /// Log text with indents corresponding to current level.
 func log(_ text: String) {
-  let indent = String(repeating: singleIndent, count: currentLevel())
+  let indent = String(repeating: " ", count: 2 * currentLevel())
   print("\(indent)\(text)")
 }
-
 
 /// Welcome messaging.
 func logWelcome() {
@@ -15,7 +20,6 @@ func logWelcome() {
     print("\n-- SSpec 0.1.0\n")
   }
 }
-
 
 /// Report on goodbuy.
 func logGoodbye() {

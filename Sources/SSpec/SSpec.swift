@@ -1,16 +1,19 @@
+//
+// SSpec
+// SSpec.swift
+//
+// Created by Dimitri Kurashvili on 2017-10-20
+//
+// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
+//
+
 import Rainbow
-
-
-/// Runnable type.
-public typealias SSRunnable = () -> Void
 
 
 /// Contextual run.
 fileprivate func contextural(_ title: String, _ runnable: SSRunnable) {
-  logWelcome()
   log(isLowestLevel() ?  " \(title) ".magenta.bold.onBlue : title.bold)
   levelDown(runnable)
-  logGoodbye()
 }
 
 
