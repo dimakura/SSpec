@@ -9,3 +9,6 @@
 
 /// Runnable type.
 public typealias SSRunnable = () -> Void
+
+/// Session. See `SSSession` for details.
+public typealias SSS = SSSession

@@ -1,56 +1,28 @@
 //
 // SSpec
-// Expect.swift
+// SSExpect.swift
 //
 // Created by Dimitri Kurashvili on 2017-10-20
 //
 // Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
 //
 
-/// Stats
-
-fileprivate var count: Int = 0
-fileprivate var failures: Int = 0
-
-func exampleInc() {
-  count += 1
-}
-
-func failuresInc() {
-  failures += 1
-}
-
-var examplesCount: Int {
-  return count
-}
-
-var failuresCount: Int {
-  return failures
-}
-
-/// Runners
-
-import Foundation
-
-
 fileprivate var failed: Bool = false
-
 
 func runExample(_ runnable: SSRunnable) -> Bool {
   failed = false
 
   runnable()
 
-  exampleInc()
+  SSS.currentSession!.exampleInc()
   if (failed) {
-    failuresInc()
+    SSS.currentSession!.failureInc()
   }
 
   return !failed
 }
 
-
-public class SSpecExpect<T: Comparable> {
+public class SSExpect<T: Comparable> {
   public typealias ComparableType = T
 
   let value: ComparableType
@@ -60,19 +32,20 @@ public class SSpecExpect<T: Comparable> {
     self.value = value
   }
 
-  public var to: SSpecExpect {
+  public var to: SSExpect {
     return self
   }
 
-  public var be: SSpecExpect {
+  public var be: SSExpect {
     return self
   }
 
-  public var not: SSpecExpect {
+  public var not: SSExpect {
     negate = true
     return self
   }
 
+  /// XXX should be in specialized comparator
   public func beTrue(_ value: Bool) {
     let compare = negate ? !value : value
     if !compare {
@@ -80,6 +53,7 @@ public class SSpecExpect<T: Comparable> {
     }
   }
 
+  /// XXX should be in specialized comparator
   public func beFalse(_ value: Bool) {
     beTrue(!value)
   }
@@ -103,11 +77,10 @@ public class SSpecExpect<T: Comparable> {
   public func lessOrEqualThan(_ anotherValue: ComparableType) {
     beTrue(value <= anotherValue)
   }
-
 }
 
 
-extension SSpecExpect where T == String {
+extension SSExpect where T == String {
   public func include(_ anotherString: String) {
     beTrue(value.range(of: anotherString) != nil)
   }

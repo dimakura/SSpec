@@ -10,68 +10,27 @@
 import XCTest
 import SSpec
 
-func arithmetics() {
-  describe("Arithmetic") {
-    let a = 10
-    let b = 5
+func testSpecs(_ spec: SSMatcher) {
+  spec.describe("Arithmetics") {
+    let a = 5
+    let b = 3
 
-    context("Multiplication and Division") {
-      it("10 * 5 = 50") {
-        expect(a / b).to.eq(2)
-      }
-
-      it("10 / 5 = 2") {
-        expect(a / b).to.eq(2)
-      }
+    spec.it("5 + 3 == 8") {
+      spec.expect(a + b).to.eq(8)
     }
 
-    context("Addition and Subtraction") {
-      it("10 + 5 = 15") {
-        expect(a + b).to.eq(15)
-      }
-
-      it("10 - 5 = 5") {
-        expect(a - b).to.eq(5)
-      }
-    }
-
-    context("Comparison") {
-      it("10 > 5") {
-        expect(a).to.be.greaterThan(b)
-      }
-
-      it("5 < 10") {
-        expect(b).to.be.lessThan(a)
-      }
-
-      it("10 != 5") {
-        expect(a).not.to.eq(b)
-      }
-    }
-  }
-}
-
-func strings() {
-  describe("Strings") {
-    let a = "Swift is awesome"
-    let b = "awe"
-
-    it("'\(a)' includes '\(b)'") {
-      expect(a).to.include(b)
-    }
-
-    it("'\(a)' doesn't include 'ugly'") {
-      expect(a).to.not.include("zero")
+    spec.it("5 - 3 != 3") {
+      spec.expect(a - b).to.not.eq(3)
     }
   }
 }
 
 class SSpecTests: XCTestCase {
   func testExample() {
-    let resp = SSRun() {
-      arithmetics()
-      strings()
-    }
+    let resp = SSS.run({ spec in
+      testSpecs(spec)
+    })
+
     XCTAssert(resp, "Some specs are failing.")
   }
 

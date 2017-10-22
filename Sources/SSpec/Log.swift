@@ -6,33 +6,24 @@
 //
 // Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
 //
+import Rainbow
 
-
-/// Log text with indents corresponding to current level.
-func log(_ text: String) {
-  let indent = String(repeating: " ", count: 2 * currentLevel())
+func log(_ text: String, level: Int = 0) {
+  let indent = String(repeating: " ", count: 2 * level)
   print("\(indent)\(text)")
-}
-
-/// Welcome messaging.
-func logWelcome() {
-  if isLowestLevel() {
-    print("\n-- SSpec 0.1.0\n")
-  }
 }
 
 /// Report on goodbuy.
 func logGoodbye() {
-  if isLowestLevel() {
-    var summary: String = "\(examplesCount) example(s)"
+  let session = SSS.currentSession!
+  var summary: String = "\(session.exampleCount) example(s)"
 
-    if failuresCount > 0 {
-      summary += ", " + "\(failuresCount) failure(s)".red.bold
-    } else {
-      summary += " OK".green
-    }
-
-    print("\nSummary: \(summary)")
-    print("\n-- Bye!\n")
+  if session.failureCount > 0 {
+    summary += ", " + "\(session.failureCount) failure(s)".red.bold
+  } else {
+    summary += " OK".green
   }
+
+  print("\nSummary: \(summary)")
+  print("\n-- Bye!\n")
 }
