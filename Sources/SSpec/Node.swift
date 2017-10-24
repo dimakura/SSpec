@@ -6,25 +6,29 @@
 //
 // Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
 //
-import Rainbow
 
-class Node {
-  static var currentId: Int = -1
-
+fileprivate struct IdGenerator {
   private static var lastId: Int = 0
-  private static var nextId: Int {
+
+  static var nextId: Int {
     lastId += 1
     return lastId
   }
+}
 
-  /// Level starts with `-1` for root node and goes up each new level.
-  let level: Int
+/// Node of specs tree.
+class Node {
+  /// When we run spec, we store id of the current example in this variable.
+  static var currentId: Int = -1
 
   /// Unique identificator of this node.
   let id: Int
 
   /// Parent node.
   let parent: Node?
+
+  /// Level starts with `-1` for root node and goes up each new level.
+  let level: Int
 
   /// Description of the node.
   let title: String
@@ -35,8 +39,9 @@ class Node {
   /// Child nodes.
   var children: [Node]
 
+  /// Creates node.
   init(title: String, parent: Node? = nil, runnable: SSRunnable? = nil) {
-    self.id = Node.nextId
+    self.id = IdGenerator.nextId
     self.parent = parent
     self.level = (parent?.level ?? -2) + 1
     self.title = title
@@ -51,24 +56,41 @@ class Node {
   func runExamples() {
     fatalError("Each subclass should implement #runExamples.")
   }
+
+  var fullTitle: String {
+    if let par = parent {
+      let parentTitle = par.fullTitle
+      return parentTitle == "ROOT" ? title : "\(par.fullTitle) \(title)"
+    }
+    return title
+  }
 }
 
+/// Root node of specs tree.
 class RootNode: Node {
   override func runInitial() {
     // skip
   }
 
   override func runExamples() {
+    SSS.currentSession.fireSpecStarted()
+
     for child in children {
       child.runExamples()
     }
+
+    SSS.currentSession.fireSpecEnded()
   }
 }
 
+/// Node which corresponds to Describe and Context.
 class DescribeNode: Node {
   override init(title: String, parent: Node? = nil, runnable: SSRunnable? = nil) {
     super.init(title: title, parent: parent, runnable: runnable)
-    if let par = parent { par.children.append(self) }
+
+    if let parent = self.parent {
+      parent.children.append(self)
+    }
   }
 
   override func runInitial() {
@@ -79,16 +101,19 @@ class DescribeNode: Node {
   override func runExamples() {
     guard let run = runnable else { return }
 
-    log(title.bold, level: level)
+    SSS.currentSession.fireContextStarted(node: self)
 
     for child in children {
       Node.currentId = child.id
       run()
       child.runExamples()
     }
+
+    SSS.currentSession.fireContextEnded(node: self)
   }
 }
 
+/// Example node.
 class ExampleNode: Node {
   override init(title: String, parent: Node? = nil, runnable: SSRunnable? = nil) {
     super.init(title: title, parent: parent, runnable: runnable)
@@ -100,15 +125,14 @@ class ExampleNode: Node {
   }
 
   override func runExamples() {
-    guard let run = runnable else { return }
+    guard self.id == Node.currentId else { return }
 
-    if (self.id == Node.currentId) {
-      let result = runExample(run)
-      if result {
-        log("\u{2714} \(title)".green, level: level)
-      } else {
-        log("\u{2717} \(title)".red, level: level)
-      }
+    if let run = runnable {
+      SSS.currentSession.fireExampleStarted(node: self)
+      run()
+      SSS.currentSession.fireExampleEnded(node: self)
+    } else {
+      SSS.currentSession.fireExampleSkipped(node: self)
     }
   }
 }

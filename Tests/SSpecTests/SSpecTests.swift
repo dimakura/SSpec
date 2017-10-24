@@ -10,28 +10,14 @@
 import XCTest
 import SSpec
 
-func testSpecs(_ spec: SSMatcher) {
-  spec.describe("Arithmetics") {
-    let a = 5
-    let b = 3
-
-    spec.it("5 + 3 == 8") {
-      spec.expect(a + b).to.eq(8)
-    }
-
-    spec.it("5 - 3 != 3") {
-      spec.expect(a - b).to.not.eq(3)
-    }
-  }
-}
-
 class SSpecTests: XCTestCase {
   func testExample() {
     let resp = SSS.run({ spec in
-      testSpecs(spec)
+      versionSpecs(spec)
+      sessionSpecs(spec)
     })
 
-    XCTAssert(resp, "Some specs are failing.")
+    XCTAssert(resp, "Some specs are failing: see output above.")
   }
 
   static var allTests = [

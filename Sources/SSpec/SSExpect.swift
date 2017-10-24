@@ -7,81 +7,117 @@
 // Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
 //
 
-fileprivate var failed: Bool = false
-
-func runExample(_ runnable: SSRunnable) -> Bool {
-  failed = false
-
-  runnable()
-
-  SSS.currentSession!.exampleInc()
-  if (failed) {
-    SSS.currentSession!.failureInc()
-  }
-
-  return !failed
+fileprivate func toString(value: Any?) -> String {
+  if let val = value { return String(describing: val) }
+  return "nil"
 }
 
-public class SSExpect<T: Comparable> {
-  public typealias ComparableType = T
+/// Expectation.
+public class SSExpect<T> {
+  /// Main object.
+  let value: T?
 
-  let value: ComparableType
-  private var negate: Bool = false
+  var valueStr: String { return toString(value: value) }
 
-  init(_ value: ComparableType) {
+  /// Negate relation.
+  var negate: Bool = false
+
+  /// Create expectation.
+  init(_ value: T?) {
     self.value = value
   }
 
+  /// Returns self: can be useful to build readable specs.
   public var to: SSExpect {
     return self
   }
 
+  /// Returns self: can be useful to build readable specs.
   public var be: SSExpect {
     return self
   }
 
+  /// Toggles negation flag. Two `not` statements restore negation.
   public var not: SSExpect {
-    negate = true
+    negate = !negate
     return self
   }
 
-  /// XXX should be in specialized comparator
-  public func beTrue(_ value: Bool) {
-    let compare = negate ? !value : value
-    if !compare {
-      failed = true
+  /// Assert if given relation is true.
+  func assert(_ value: Bool, error: String, errorNegate: String? = nil) {
+    if negate && value {
+      SSS.currentSession.fireExampleError(error: errorNegate ?? error)
+    } else if !negate && !value {
+      SSS.currentSession.fireExampleError(error: error)
     }
   }
 
-  /// XXX should be in specialized comparator
-  public func beFalse(_ value: Bool) {
-    beTrue(!value)
-  }
+  /// Asserts if given relation is false.
+  // public func refute(_ value: Bool, error: String, errorNegate: String? = nil) {
+  //   assert(!value, error: error, errorNegate: errorNegate ?? error)
+  // }
 
-  public func eq(_ anotherValue: ComparableType) {
-    beTrue(value == anotherValue)
-  }
-
-  public func greaterThan(_ anotherValue: ComparableType) {
-    beTrue(value > anotherValue)
-  }
-
-  public func greaterOrEqualtThan(_ anotherValue: ComparableType) {
-    beTrue(value >= anotherValue)
-  }
-
-  public func lessThan(_ anotherValue: ComparableType) {
-    beTrue(value < anotherValue)
-  }
-
-  public func lessOrEqualThan(_ anotherValue: ComparableType) {
-    beTrue(value <= anotherValue)
+  public var beNil: Void {
+    assert(
+      value == nil,
+      error: "Expected `\(valueStr)` to be nil",
+      errorNegate: "Expected `\(valueStr)` to NOT be nil"
+    )
   }
 }
 
+/// Equality extension.
+extension SSExpect where T: Equatable {
+  public func eq(_ anotherValue: T?) {
+    let anotherValueStr = toString(value: anotherValue)
 
-extension SSExpect where T == String {
-  public func include(_ anotherString: String) {
-    beTrue(value.range(of: anotherString) != nil)
+    assert(
+      value == anotherValue,
+      error: "Expected \(valueStr) to equal \(anotherValueStr)",
+      errorNegate: "Expected \(valueStr) to NOT equal \(anotherValueStr)"
+    )
   }
 }
+
+// extension SSExpect where T: Comparable {
+//   public func greaterThan(_ anotherValue: T) {
+//     beTrue(value > anotherValue)
+//   }
+//
+//   public func greaterOrEqualtThan(_ anotherValue: T) {
+//     beTrue(value >= anotherValue)
+//   }
+//
+//   public func lessThan(_ anotherValue: T) {
+//     beTrue(value < anotherValue)
+//   }
+//
+//   public func lessOrEqualThan(_ anotherValue: T) {
+//     beTrue(value <= anotherValue)
+//   }
+// }
+
+/// Extension for boolean values.
+extension SSExpect where T == Bool {
+  public var beTrue: Void {
+    assert(
+      value == true,
+      error: "Expected \(valueStr) to be true",
+      errorNegate: "Expected \(valueStr) to be false"
+    )
+  }
+
+  public var beFalse: Void {
+    assert(
+      value == false,
+      error: "Expected \(valueStr) to be false",
+      errorNegate: "Expected \(valueStr) to be true"
+    )
+  }
+}
+
+// extension SSExpect where T == String {
+//   public func include(_ anotherString: String) {
+//     beTrue(value.range(of: anotherString) != nil)
+//   }
+// }

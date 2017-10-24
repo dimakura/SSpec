@@ -1,63 +1,69 @@
 # SSpec
 
-Behavior driven development in Swift.
+`SSpec` offers nice alternative to standard `XCTest` for Swift developers.
+Instead of writing test as sequence of assertions you can organize it in
+easily testable and documented steps.
+
+If you worked with behavior driven development (BDD) before
+you will find `SSpec` to be already familiar. For those new to BDD, it's
+still easy to get started and worth spending some time to understand it.
 
 [![Build Status](https://travis-ci.org/dimakura/SSpec.svg?branch=master)](https://travis-ci.org/dimakura/SSpec)
 
-## Example
+## Installation
 
-The following code:
+Add the following dependency in your `Package.swift` config:
 
 ```swift
-describe("Simple Types") {
-  context("Integers") {
-    let a = 10
-    let b = 5
-
-    it("10 / 5 = 2") {
-      expect(a / b).to.eq(2)
-    }
-
-    it("10 - 5 = 5") {
-      expect(a - b).to.eq(5)
-    }
-
-    it("10 + 5 = 15") {
-      expect(a + b).to.eq(15)
-    }
-
-    it("10 * 5 = 50") {
-      expect(a / b).to.eq(2)
-    }
-
-    it("10 > 5") {
-      expect(a).to.be.greaterThan(b)
-    }
-
-    it("5 < 10") {
-      expect(b).to.be.lessThan(a)
-    }
-
-    it("10 != 5") {
-      expect(a).not.to.eq(b)
-    }
-  }
-
-  context("Strings") {
-    let a = "Swift is awesome"
-    let b = "awe"
-
-    it("'\(a)' includes '\(b)'") {
-      expect(a).to.include(b)
-    }
-
-    it("'\(a)' doesn't include 'ugly'") {
-      expect(a).to.not.include("zero")
-    }
-  }
-}
+.package(url: "https://github.com/dimakura/SSpec", from: "0.1.0")
 ```
 
-Produces output:
+And don't forget to add it as dependency in your test target:
 
-![Simple Example](https://s1.postimg.org/1thm1auoy7/Screen_Shot_2017-10-19_at_2.28.36_PM.png)
+```swift
+.testTarget(
+  name: "MyPackageTests",
+  dependencies: [
+    "SSpec",
+    // your other dependencies
+  ]),
+```
+
+Package will be configured by swift package manager after:
+
+```sh
+swift build
+```
+
+## Usage
+
+A minimal usage example is given below:
+
+```swift
+import XCTest
+import SSpec                       // import SSpec package
+@testable import MyPackage         // import your package as usual
+
+func theTruth(_ spec: SSMatcher) { // SSMatcher provides `it`, `describe`, `expect` etc. methods
+  spec.it("Ground truth") {        // Example
+    spec.expect(true).to.beTrue()  // tests that `true` is `true` indeed
+  }
+}
+
+class MyPackageTests: XCTestCase {   // To bootstrap `SSpec` we still use `XCTest`
+                                     // to easily integrate with existing tools
+
+  func testEverything() {            // This is the only test you need to define
+    let resp = SSS.run { spec in     // `resp` is Bool
+      theTruth(spec)                 // You call the function we defined above
+      // more functions can be called
+    }
+
+    XCTAssert(resp, "Some specs are failing.") // Report `resp` to have nice integration with CIs
+  }
+
+  static var allTests = [
+    ("testEverything", testEverything),
+  ]
+}
+```
