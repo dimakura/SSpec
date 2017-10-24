@@ -9,6 +9,7 @@
 
 /// Runnable type.
 public typealias SSRunnable = () -> Void
+public typealias MatcherFunction = (String, SSRunnable?) -> Void
 
 /// Matching interface.
 public class SSMatcher {
@@ -18,25 +19,21 @@ public class SSMatcher {
     _currentNode = RootNode(title: "ROOT")
   }
 
-  func execInitMode(_ runnable: (SSMatcher) -> Void) {
-    runnable(self)
+  func execInitMode(_ runnable: SSRunnable) {
+    runnable()
   }
 
-  func execRunMode(_ runnable: (SSMatcher) -> Void) {
+  func execRunMode(_ runnable: SSRunnable) {
     _currentNode.runExamples()
   }
 
-  public func describe(_ title: String, _ runnable: SSRunnable? = nil) {
+  func describe(_ title: String, _ runnable: SSRunnable? = nil) {
     buildTree {
       return DescribeNode(title: title, parent: _currentNode, runnable: runnable)
     }
   }
 
-  public func context(_ title: String, _ runnable: SSRunnable? = nil) {
-    describe(title, runnable)
-  }
-
-  public func it(_ title: String, _ runnable: SSRunnable? = nil) {
+  func it(_ title: String, _ runnable: SSRunnable? = nil) {
     buildTree {
       return ExampleNode(title: title, parent: _currentNode, runnable: runnable)
     }
@@ -54,26 +51,6 @@ public class SSMatcher {
   }
 }
 
-extension SSMatcher {
-  public func expect<Bool>(_ value: Bool) -> SSExpect<Bool> {
-    return SSExpect<Bool>(value)
-  }
-}
-
-extension SSMatcher {
-  func expect(_ value: Int?) -> SSExpect<Int> {
-    return SSExpect<Int>(value)
-  }
-
-  public func expect(_ value: Float?) -> SSExpect<Float> {
-    return SSExpect<Float>(value)
-  }
-
-  public func expect(_ value: Double?) -> SSExpect<Double> {
-    return SSExpect<Double>(value)
-  }
-
-  public func expect(_ value: String?) -> SSExpect<String> {
-    return SSExpect<String>(value)
-  }
-}
+public var describe: MatcherFunction { return SSS.currentSession.matcher.describe }
+public var context: MatcherFunction { return SSS.currentSession.matcher.describe }
+public var it: MatcherFunction { return SSS.currentSession.matcher.it }

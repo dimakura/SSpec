@@ -7,6 +7,7 @@
 // Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
 //
 
+/// Convert given value to string.
 fileprivate func toString(value: Any?) -> String {
   if let val = value { return String(describing: val) }
   return "nil"
@@ -17,6 +18,7 @@ public class SSExpect<T> {
   /// Main object.
   let value: T?
 
+  /// Value represented as a string.
   var valueStr: String { return toString(value: value) }
 
   /// Negate relation.
@@ -52,11 +54,6 @@ public class SSExpect<T> {
     }
   }
 
-  /// Asserts if given relation is false.
-  // public func refute(_ value: Bool, error: String, errorNegate: String? = nil) {
-  //   assert(!value, error: error, errorNegate: errorNegate ?? error)
-  // }
-
   public var beNil: Void {
     assert(
       value == nil,
@@ -65,37 +62,6 @@ public class SSExpect<T> {
     )
   }
 }
-
-/// Equality extension.
-extension SSExpect where T: Equatable {
-  public func eq(_ anotherValue: T?) {
-    let anotherValueStr = toString(value: anotherValue)
-
-    assert(
-      value == anotherValue,
-      error: "Expected \(valueStr) to equal \(anotherValueStr)",
-      errorNegate: "Expected \(valueStr) to NOT equal \(anotherValueStr)"
-    )
-  }
-}
-
-// extension SSExpect where T: Comparable {
-//   public func greaterThan(_ anotherValue: T) {
-//     beTrue(value > anotherValue)
-//   }
-//
-//   public func greaterOrEqualtThan(_ anotherValue: T) {
-//     beTrue(value >= anotherValue)
-//   }
-//
-//   public func lessThan(_ anotherValue: T) {
-//     beTrue(value < anotherValue)
-//   }
-//
-//   public func lessOrEqualThan(_ anotherValue: T) {
-//     beTrue(value <= anotherValue)
-//   }
-// }
 
 /// Extension for boolean values.
 extension SSExpect where T == Bool {
@@ -116,8 +82,50 @@ extension SSExpect where T == Bool {
   }
 }
 
-// extension SSExpect where T == String {
-//   public func include(_ anotherString: String) {
-//     beTrue(value.range(of: anotherString) != nil)
+/// String extensions.
+extension SSExpect where T == String {
+  public func include(_ anotherString: String) {
+    assert(
+      value?.range(of: anotherString) != nil,
+      error: "Expected `\(valueStr)` to include `\(toString(value: anotherString))`",
+      errorNegate: "Expected `\(valueStr)` to NOT include `\(toString(value :anotherString))`"
+    )
+  }
+}
+
+/// Equality extension.
+extension SSExpect where T: Equatable {
+  public func eq(_ anotherValue: T?) {
+    let anotherValueStr = toString(value: anotherValue)
+
+    assert(
+      value == anotherValue,
+      error: "Expected \(valueStr) to equal \(anotherValueStr)",
+      errorNegate: "Expected \(valueStr) to NOT equal \(anotherValueStr)"
+    )
+  }
+}
+
+// /// Comparable extension.
+// extension SSExpect where T: Comparable {
+//   public func greaterThan(_ anotherValue: T) {
+//     // beTrue(value > anotherValue)
+//   }
+//
+//   public func greaterOrEqualtThan(_ anotherValue: T) {
+//     // beTrue(value >= anotherValue)
+//   }
+//
+//   public func lessThan(_ anotherValue: T) {
+//     // beTrue(value < anotherValue)
+//   }
+//
+//   public func lessOrEqualThan(_ anotherValue: T) {
+//     // beTrue(value <= anotherValue)
 //   }
 // }
+
+/// Create expectation object.
+public func expect<T>(_ value: T?) -> SSExpect<T> {
+  return SSExpect<T>(value)
+}

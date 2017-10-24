@@ -8,19 +8,52 @@
 //
 
 import XCTest
-import SSpec
+@testable import SSpec
 
 class SSpecTests: XCTestCase {
-  func testExample() {
-    let resp = SSS.run({ spec in
-      versionSpecs(spec)
-      sessionSpecs(spec)
-    })
+  func testSimpleSessions() {
+    let s1 = SSS.run {
+      it("wrong math") { expect(2 + 2).to.eq(5) }
+    }
+    XCTAssert(s1.exampleCount == 1)
+    XCTAssert(s1.hasErrors == true)
 
-    XCTAssert(resp, "Some specs are failing: see output above.")
+    let s2 = SSS.run {
+      it("correct math") { expect(2 + 2).to.eq(4) }
+    }
+    XCTAssert(s2.exampleCount == 1)
+    XCTAssert(s2.hasErrors == false)
+
+    let s3 = SSS.run {
+      describe("Arithmetics") {
+        context("addition") {
+          it("2 + 2 = 4") {
+            expect(2 + 2).to.eq(4)
+          }
+        }
+        context("multiplication") {
+          it("2 * 2 = 4") {
+            expect(2 * 2).to.eq(4)
+          }
+        }
+      }
+    }
+    XCTAssert(s3.exampleCount == 2)
+    XCTAssert(s3.hasErrors == false)
+  }
+
+  func testSpecs() {
+    let session = SSS.run {
+      versionSpecs()
+      sessionSpecs()
+      generalSpecs()
+    }
+
+    XCTAssert(session.hasErrors == false)
   }
 
   static var allTests = [
-    ("testExample", testExample),
+    ("testSimpleSessions", testSimpleSessions),
+    ("testSpecs", testSpecs),
   ]
 }

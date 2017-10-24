@@ -7,27 +7,24 @@
 // Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
 //
 
-/// Session running modes.
+/// Running modes for SSSession.
 enum SessionMode {
-  /// Initial phase: initialization.
+  /// Phase when we build execution tree.
   case Initializing
 
-  /// Phase for running actual examples.
+  /// Phase when examples are run.
   case Running
-
-  /// Final reporting phase.
-  case Finalizing
 }
 
-/// Main interface for running specs.
+/// Interface for running specs.
 ///
 /// ```swift
-/// let result = SSS.run(spec in {
-///   spec.it("2 * 2 = 4", {
-///     spec.expect(2 * 2).to.eq(4)
-///   })
-/// })
-/// XCTAssert(result, "Some specs are failing.")
+/// let session = SSS.run {
+///   it("2 + 2 = 4") {
+///     expect(2 + 2).to.eq(4)
+///   }
+/// }
+/// XCTAssert(session.hasErrors == false, "Some specs are failing.")
 /// ```
 public class SSSession {
   /// Currently executing session.
@@ -35,31 +32,28 @@ public class SSSession {
   static var currentSession: SSSession { return _currentSession! }
 
   /// You use this method only once for running sessions.
-  public static func run(_ runnable: (SSMatcher) -> Void) -> Bool {
-    guard _currentSession == nil else { fatalError("Another session is already running.") }
-
+  public static func run(_ runnable: SSRunnable) -> SSS {
     _currentSession = SSSession()
     currentSession.execute(runnable)
-
-    return !currentSession.hasErrors
+    return currentSession
   }
 
   /// Session matcher.
   let matcher: SSMatcher
 
   private var _mode: SessionMode?
-
-  /// If current session has errors?
   private var _hasErrors: Bool = false
-  var hasErrors: Bool { return _hasErrors }
+  private var _exampleCount: Int = 0
+  private let listeners: [SSSessionListenerProtocol]
 
   /// Current session mode.
-  var mode: SessionMode {
-    return _mode!
-  }
+  var mode: SessionMode { return _mode! }
 
-  /// Session listeners.
-  private let listeners: [SSSessionListenerProtocol]
+  /// Result of running this session.
+  public var hasErrors: Bool { return _hasErrors }
+
+  /// Example count.
+  public var exampleCount: Int { return _exampleCount }
 
   /// Create session.
   init() {
@@ -73,15 +67,19 @@ public class SSSession {
   }
 
   /// Execute session.
-  func execute(_ runnable: (SSMatcher) -> Void) {
+  func execute(_ runnable: SSRunnable) {
+    execInitializationMode(runnable: runnable)
+    execRunningMode(runnable: runnable)
+  }
+
+  private func execInitializationMode(runnable: SSRunnable) {
     _mode = .Initializing
     matcher.execInitMode(runnable)
+  }
 
+  private func execRunningMode(runnable: SSRunnable) {
     _mode = .Running
     matcher.execRunMode(runnable)
-
-    // _mode = .Finalizing
-    // runnable(matcher)
   }
 }
 
@@ -105,6 +103,7 @@ extension SSSession {
   }
 
   func fireExampleStarted(node: ExampleNode) {
+    _exampleCount += 1
     notifyAll { listener in listener.exampleStarted(node: node) }
   }
 

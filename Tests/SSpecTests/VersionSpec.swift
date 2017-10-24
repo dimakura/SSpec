@@ -9,12 +9,12 @@
 
 @testable import SSpec
 
-func versionSpecs(_ spec: SSMatcher) {
-  spec.describe("Version") {
+func versionSpecs() {
+  describe("Version") {
     let v = Version.currentVersion
 
-    spec.it("is 0.1.0") {
-      spec.expect(v.description).to.eq("0.1.0")
+    it("is 0.1.0") {
+      expect(v.description).to.eq("0.1.0")
     }
   }
 }

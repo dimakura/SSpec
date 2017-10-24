@@ -37,33 +37,37 @@ swift build
 
 ## Usage
 
-A minimal usage example is given below:
+Let's consider simplest example:
 
 ```swift
-import XCTest
-import SSpec                       // import SSpec package
-@testable import MyPackage         // import your package as usual
-
-func theTruth(_ spec: SSMatcher) { // SSMatcher provides `it`, `describe`, `expect` etc. methods
-  spec.it("Ground truth") {        // Example
-    spec.expect(true).to.beTrue()  // tests that `true` is `true` indeed
+let session = SSS.run {
+  it("correct math") {
+    expect(2 + 2).to.eq(4)
   }
 }
 
-class MyPackageTests: XCTestCase {   // To bootstrap `SSpec` we still use `XCTest`
-                                     // to easily integrate with existing tools
-
-  func testEverything() {            // This is the only test you need to define
-    let resp = SSS.run { spec in     // `resp` is Bool
-      theTruth(spec)                 // You call the function we defined above
-      // more functions can be called
-    }
-
-    XCTAssert(resp, "Some specs are failing.") // Report `resp` to have nice integration with CIs
-  }
-
-  static var allTests = [
-    ("testEverything", testEverything),
-  ]
-}
+XCTAssert(session.hasErrors == false)
 ```
+
+It contains single example ("correct math") which is run inside `SSS.run { ... }`.
+
+Note the last line in this example:
+
+```swift
+XCTAssert(session.hasErrors == false)
+```
+
+This line is not strictly necessary but in case your
+CI infrastructure relies on XCTest's failure this will help.
+
+You will see nice output after running example above:
+
+![Simple Example Output](https://s1.postimg.org/3yxge26htb/Screen_Shot_2017-10-24_at_9.23.22_PM.png)
+
+## Describe and context
+
+TODO:
+
+## Matchers
+
+TODO:

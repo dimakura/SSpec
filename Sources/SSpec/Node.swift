@@ -7,7 +7,7 @@
 // Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
 //
 
-fileprivate struct IdGenerator {
+struct IdGenerator {
   private static var lastId: Int = 0
 
   static var nextId: Int {
@@ -36,6 +36,9 @@ class Node {
   /// Executable for this node.
   let runnable: SSRunnable?
 
+  /// Is this a root node?
+  var isRoot: Bool { return false }
+
   /// Child nodes.
   var children: [Node]
 
@@ -58,9 +61,8 @@ class Node {
   }
 
   var fullTitle: String {
-    if let par = parent {
-      let parentTitle = par.fullTitle
-      return parentTitle == "ROOT" ? title : "\(par.fullTitle) \(title)"
+    if let parent = self.parent {
+      return parent.isRoot ? title : "\(parent.fullTitle) \(title)"
     }
     return title
   }
@@ -68,6 +70,8 @@ class Node {
 
 /// Root node of specs tree.
 class RootNode: Node {
+  override var isRoot: Bool { return true }
+
   override func runInitial() {
     // skip
   }
@@ -125,7 +129,7 @@ class ExampleNode: Node {
   }
 
   override func runExamples() {
-    guard self.id == Node.currentId else { return }
+    guard canRunExample() else { return }
 
     if let run = runnable {
       SSS.currentSession.fireExampleStarted(node: self)
@@ -134,5 +138,12 @@ class ExampleNode: Node {
     } else {
       SSS.currentSession.fireExampleSkipped(node: self)
     }
+  }
+
+  private func canRunExample() -> Bool {
+    if self.id == Node.currentId { return true }
+    if let parent = self.parent, parent.isRoot { return true }
+
+    return false
   }
 }
