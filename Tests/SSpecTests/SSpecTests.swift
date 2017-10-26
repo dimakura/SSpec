@@ -44,9 +44,16 @@ class SSpecTests: XCTestCase {
 
   func testSpecs() {
     let session = SSS.run {
-      versionSpecs()
-      sessionSpecs()
-      generalSpecs()
+      describe("SSpec") {
+        versionSpecs()
+        sessionSpecs()
+      }
+      describe("General specs") {
+        nilableSpecs()
+        booleanSpecs()
+        stringSpecs()
+        equatableSpecs()
+      }
     }
 
     XCTAssert(session.hasErrors == false)

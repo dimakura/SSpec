@@ -11,14 +11,13 @@
 
 func sessionSpecs() {
   context("Session") {
-    // This session is the same as the one we are currently running.
     let s = SSS.currentSession
 
-    it("should be in running mode") {
-      expect(s.mode).to.eq(SessionMode.Running)
+    it("is running") {
+      expect(s.mode).to.eq(SSS.Mode.Running)
     }
 
-    it("should have matcher") {
+    it("has a matcher") {
       expect(s.matcher).to.not.beNil
     }
   }

@@ -10,7 +10,7 @@
 import Rainbow
 
 /// Progress reporter.
-class ProgressReporter: SSSessionListenerAdapter {
+class ProgressReporter: SSSession.Collector {
   private var exampleFailures: Int = 0
   private var currentExample: ExampleNode?
   private var exampleTitles = [Int: String]()

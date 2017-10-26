@@ -7,15 +7,6 @@
 // Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
 //
 
-/// Running modes for SSSession.
-enum SessionMode {
-  /// Phase when we build execution tree.
-  case Initializing
-
-  /// Phase when examples are run.
-  case Running
-}
-
 /// Interface for running specs.
 ///
 /// ```swift
@@ -24,9 +15,19 @@ enum SessionMode {
 ///     expect(2 + 2).to.eq(4)
 ///   }
 /// }
-/// XCTAssert(session.hasErrors == false, "Some specs are failing.")
+/// XCTAssert(session.hasErrors == false)
 /// ```
 public class SSSession {
+
+  /// Session mode.
+  enum Mode {
+    /// Mode when we build execution tree.
+    case Initializing
+
+    /// Mode when examples are run.
+    case Running
+  }
+
   /// Currently executing session.
   static var _currentSession: SSSession?
   static var currentSession: SSSession { return _currentSession! }
@@ -41,13 +42,13 @@ public class SSSession {
   /// Session matcher.
   let matcher: SSMatcher
 
-  private var _mode: SessionMode?
+  private var _mode: Mode?
   private var _hasErrors: Bool = false
   private var _exampleCount: Int = 0
-  private let listeners: [SSSessionListenerProtocol]
+  private let collectors: [Collector]
 
-  /// Current session mode.
-  var mode: SessionMode { return _mode! }
+  /// Session mode.
+  var mode: Mode { return _mode! }
 
   /// Result of running this session.
   public var hasErrors: Bool { return _hasErrors }
@@ -59,7 +60,7 @@ public class SSSession {
   init() {
     matcher = SSMatcher()
 
-    listeners = [
+    collectors = [
       Welcomer(),
       ProgressReporter(),
       TimeTaken()
@@ -84,44 +85,56 @@ public class SSSession {
 }
 
 extension SSSession {
-  private func notifyAll(_ fireListener: (SSSessionListenerProtocol) -> Void) {
-    for listener in self.listeners {
-      fireListener(listener)
+  /// Base class for collecting session related events.
+  class Collector {
+    func specStarted() {}
+    func contextStarted(node: DescribeNode) {}
+    func exampleSkipped(node: ExampleNode) {}
+    func exampleStarted(node: ExampleNode) {}
+    func exampleError(error: String) {}
+    func exampleEnded(node: ExampleNode) {}
+    func contextEnded(node: DescribeNode) {}
+    func specEnded() {}
+  }
+
+  private func emitAll(_ emit: (Collector) -> Void) {
+    for collector in self.collectors {
+      emit(collector)
     }
   }
 
-  func fireSpecStarted() {
-    notifyAll { listener in listener.specStarted() }
+  func collectSpecStarted() {
+    emitAll { collector in collector.specStarted() }
   }
 
-  func fireContextStarted(node: DescribeNode) {
-    notifyAll { listener in listener.contextStarted(node: node) }
+  func collectContextStarted(node: DescribeNode) {
+    emitAll { collector in collector.contextStarted(node: node) }
   }
 
-  func fireExampleSkipped(node: ExampleNode) {
-    notifyAll { listener in listener.exampleSkipped(node: node) }
+  func collectExampleSkipped(node: ExampleNode) {
+    emitAll { collector in collector.exampleSkipped(node: node) }
   }
 
-  func fireExampleStarted(node: ExampleNode) {
+  func collectExampleStarted(node: ExampleNode) {
     _exampleCount += 1
-    notifyAll { listener in listener.exampleStarted(node: node) }
+    emitAll { collector in collector.exampleStarted(node: node) }
   }
 
-  func fireExampleError(error: String) {
+  func collectExampleError(error: String) {
     _hasErrors = true
-    notifyAll { listener in listener.exampleError(error: error) }
+    emitAll { collector in collector.exampleError(error: error) }
   }
 
-  func fireExampleEnded(node: ExampleNode) {
-    notifyAll { listener in listener.exampleEnded(node: node) }
+  func collectExampleEnded(node: ExampleNode) {
+    emitAll { collector in collector.exampleEnded(node: node) }
   }
 
-  func fireContextEnded(node: DescribeNode) {
-    notifyAll { listener in listener.contextEnded(node: node) }
+  func collectContextEnded(node: DescribeNode) {
+    emitAll { collector in collector.contextEnded(node: node) }
   }
 
-  func fireSpecEnded() {
-    notifyAll { listener in listener.specEnded() }
+  func collectSpecEnded() {
+    emitAll { collector in collector.specEnded() }
   }
 }
 

@@ -1,68 +1,87 @@
 # SSpec
 
-`SSpec` offers nice alternative to standard `XCTest` for Swift developers.
-Instead of writing test as sequence of assertions you can organize it in
-easily testable and documented steps.
+`SSpec` offers awesome alternative to `XCTest` for Swift developers.
 
-If you worked with behavior driven development (BDD) before
-you will find `SSpec` to be already familiar. For those new to BDD, it's
-still easy to get started and worth spending some time to understand it.
+Instead of writing tests as a sequence of assertions you can organize them in small, easily readable steps.
+
+If you worked with behavior driven development (BDD) before, `SSpec` is already familiar to you.
+And it's simple to understand for those of you who never worked with BDD framework before.
 
 [![Build Status](https://travis-ci.org/dimakura/SSpec.svg?branch=master)](https://travis-ci.org/dimakura/SSpec)
 
 ## Installation
 
-Add the following dependency in your `Package.swift` config:
+Add `SSpec` as package dependency in your project's `Package.swift` file:
 
 ```swift
 .package(url: "https://github.com/dimakura/SSpec", from: "0.1.0")
 ```
 
-And don't forget to add it as dependency in your test target:
+You should also put it under test target's dependencies:
 
 ```swift
 .testTarget(
   name: "MyPackageTests",
   dependencies: [
     "SSpec",
-    // your other dependencies
+    // other dependencies
   ]),
 ```
 
-Package will be configured by swift package manager after:
+`SSpec` will be downloaded and installed by Swift package manager after building your project:
 
 ```sh
 swift build
 ```
 
-## Usage
-
-Let's consider simplest example:
+And finally import `SSpec` to use it in your code:
 
 ```swift
-let session = SSS.run {
-  it("correct math") {
-    expect(2 + 2).to.eq(4)
+import SSpec
+```
+
+## Simple example
+
+This is our first example:
+
+```swift
+let session = SSSession.run {    // 1
+  it("correct math") {           // 2
+    expect(2 + 2).to.eq(4)       // 3
   }
 }
 
 XCTAssert(session.hasErrors == false)
 ```
 
-It contains single example ("correct math") which is run inside `SSS.run { ... }`.
+At first line we create session with call to static `SSSession.run` method.
+Inside closure for this method we define our test examples.
 
-Note the last line in this example:
+The first (and only) test example is defined on the second line.
+It has title ("correct math") and one more closure.
+
+Inside test example's closure at line three, you can see actual example.
+It makes sure that `2 + 2` is equal to `4`.
+
+Session runs all examples and checks that all of them are correct.
+Here's how it looks in terminal:
+
+![Simple Example Output](https://s1.postimg.org/3yxge26htb/Screen_Shot_2017-10-24_at_9.23.22_PM.png)
+
+If any example fails, session will print detailed report of what went wrong in which example,
+so you can easily locate source of the problem.
+
+To detect failures programmatically, you can use session's `hasErrors` property, which is
+`false` by default, but becomes `true` once there's at least one example failing in your specs.
+
+You can use this property to report failure back to `XCTest`:
 
 ```swift
 XCTAssert(session.hasErrors == false)
 ```
 
-This line is not strictly necessary but in case your
-CI infrastructure relies on XCTest's failure this will help.
-
-You will see nice output after running example above:
-
-![Simple Example Output](https://s1.postimg.org/3yxge26htb/Screen_Shot_2017-10-24_at_9.23.22_PM.png)
+This is not strictly necessary. But in cases when your CI relies on XCTest's failure,
+it's a handy way to detect errors.
 
 ## Describe and context
 

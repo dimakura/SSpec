@@ -77,13 +77,13 @@ class RootNode: Node {
   }
 
   override func runExamples() {
-    SSS.currentSession.fireSpecStarted()
+    SSS.currentSession.collectSpecStarted()
 
     for child in children {
       child.runExamples()
     }
 
-    SSS.currentSession.fireSpecEnded()
+    SSS.currentSession.collectSpecEnded()
   }
 }
 
@@ -105,7 +105,7 @@ class DescribeNode: Node {
   override func runExamples() {
     guard let run = runnable else { return }
 
-    SSS.currentSession.fireContextStarted(node: self)
+    SSS.currentSession.collectContextStarted(node: self)
 
     for child in children {
       Node.currentId = child.id
@@ -113,7 +113,7 @@ class DescribeNode: Node {
       child.runExamples()
     }
 
-    SSS.currentSession.fireContextEnded(node: self)
+    SSS.currentSession.collectContextEnded(node: self)
   }
 }
 
@@ -132,11 +132,11 @@ class ExampleNode: Node {
     guard canRunExample() else { return }
 
     if let run = runnable {
-      SSS.currentSession.fireExampleStarted(node: self)
+      SSS.currentSession.collectExampleStarted(node: self)
       run()
-      SSS.currentSession.fireExampleEnded(node: self)
+      SSS.currentSession.collectExampleEnded(node: self)
     } else {
-      SSS.currentSession.fireExampleSkipped(node: self)
+      SSS.currentSession.collectExampleSkipped(node: self)
     }
   }
 
