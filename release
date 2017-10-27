@@ -1,0 +1,82 @@
+#!/bin/sh
+
+# Script for releasing a new version.
+#
+# For the moment it's just pushing a new release to Github (with new tag creation).
+#
+# To run this script you need to have "github" configuration file in project root
+# directory with USERNAME and your TOKEN (personal access token https://github.com/settings/tokens).
+
+CONFIG="./github"
+RELEASES_URL="https://api.github.com/repos/dimakura/SSpec/releases"
+RELEASE=${1:-patch}
+
+# Checking release type.
+if ! [[ "$RELEASE" =~ ^(major|minor|patch)$ ]]
+then
+  echo "Usage: ./release (major|minor|patch)"
+  exit 1
+fi
+
+# Reading Github config
+if [ -f $CONFIG ]
+then
+  GITHUB_TOKEN=$(grep TOKEN $CONFIG | cut -d'=' -f2)
+  GITHUB_USER=$(grep USER $CONFIG | cut -d'=' -f2)
+else
+  echo Config file not found: $CONFIG
+  exit 1
+fi
+
+# Calculate the next version from the latest release.
+function calculateNextVersion {
+  latest_version=$(curl -u $GITHUB_USER:$GITHUB_TOKEN -s $RELEASES_URL/latest | jq -r ".tag_name")
+  if [ $latest_version = null ]
+  then
+    latest_version="0.0.0"
+  fi
+
+  IFS=.
+  set $latest_version
+
+  if [ $RELEASE = "major" ]
+  then
+    echo $(($1+1)).0.0
+  elif [ $RELEASE = "minor" ]
+  then
+    echo $1.$(($2+1)).0
+  else
+    echo $1.$2.$(($3+1))
+  fi
+}
+
+# Build JSON for Github API.
+newVersion=$(calculateNextVersion $RELEASE)
+tag_name="$newVersion"
+name="Version $newVersion"
+target_commitish="master"
+body=$(echo "Add notes for this release $newVersion" | vipe | jq '@text' -R -s -M)
+json=$(cat << EOF
+  {
+    "tag_name": "$tag_name",
+    "target_commitish": "$target_commitish",
+    "name": "$name",
+    "body": $body,
+    "draft": true,
+    "prerelease": false
+  }
+EOF
+)
+
+# Sending request.
+resp=$(curl -u $GITHUB_USER:$GITHUB_TOKEN -s -X POST $RELEASES_URL -d "$json")
+
+# Finalize.
+created_at=$(jq -r ".created_at" <<<$resp)
+if [ $created_at = null ]
+then
+  echo $(jq -r ".message" <<<$resp)
+  exit 1
+else
+  echo "Done $newVersion"
+fi
