@@ -27,13 +27,13 @@ public class SSMatcher {
     _currentNode.runExamples()
   }
 
-  func describe(_ title: String, _ runnable: SSRunnable? = nil) {
+  func describe(_ title: String, _ runnable: SSRunnable?) {
     buildTree {
       return DescribeNode(title: title, parent: _currentNode, runnable: runnable)
     }
   }
 
-  func it(_ title: String, _ runnable: SSRunnable? = nil) {
+  func it(_ title: String, _ runnable: SSRunnable?) {
     buildTree {
       return ExampleNode(title: title, parent: _currentNode, runnable: runnable)
     }
@@ -51,6 +51,17 @@ public class SSMatcher {
   }
 }
 
-public var describe: MatcherFunction { return SSS.currentSession.matcher.describe }
-public var context: MatcherFunction { return SSS.currentSession.matcher.describe }
-public var it: MatcherFunction { return SSS.currentSession.matcher.it }
+/// Describe function.
+public func describe(_ title: String, _ runnable: SSRunnable? = nil) {
+  SSS.currentSession.matcher.describe(title, runnable)
+}
+
+/// Context function.
+public func context(_ title: String, _ runnable: SSRunnable? = nil) {
+  SSS.currentSession.matcher.describe(title, runnable)
+}
+
+/// Example function.
+public func it(_ title: String, _ runnable: SSRunnable? = nil) {
+  SSS.currentSession.matcher.it(title, runnable)
+}

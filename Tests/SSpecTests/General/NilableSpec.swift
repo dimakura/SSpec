@@ -12,8 +12,7 @@ import SSpec
 func nilableSpecs() {
   context("Nilable") {
     it("is nil") {
-      let nilValue: String? = nil
-      expect(nilValue).to.beNil
+      expect(nil as String?).to.beNil
     }
 
     it("is not nil") {

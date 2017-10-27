@@ -53,6 +53,7 @@ class SSpecTests: XCTestCase {
         booleanSpecs()
         stringSpecs()
         equatableSpecs()
+        arraySpecs()
       }
     }
 

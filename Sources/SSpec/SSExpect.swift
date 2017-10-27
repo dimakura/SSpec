@@ -15,7 +15,7 @@ fileprivate func toString(value: Any?) -> String {
 
 /// Expectation.
 public class SSExpect<T> {
-  /// Main object.
+  /// Value to compare.
   let value: T?
 
   /// Value represented as a string.
@@ -57,8 +57,8 @@ public class SSExpect<T> {
   public var beNil: Void {
     assert(
       value == nil,
-      error: "Expected `\(valueStr)` to be nil",
-      errorNegate: "Expected `\(valueStr)` to NOT be nil"
+      error: "Expected \(valueStr) to be nil",
+      errorNegate: "Expected \(valueStr) to not be nil"
     )
   }
 }
@@ -87,8 +87,8 @@ extension SSExpect where T == String {
   public func include(_ anotherString: String) {
     assert(
       value?.range(of: anotherString) != nil,
-      error: "Expected `\(valueStr)` to include `\(toString(value: anotherString))`",
-      errorNegate: "Expected `\(valueStr)` to NOT include `\(toString(value :anotherString))`"
+      error: "Expected \(valueStr) to include \(toString(value: anotherString))",
+      errorNegate: "Expected \(valueStr) to not include \(toString(value :anotherString))"
     )
   }
 }
@@ -101,7 +101,62 @@ extension SSExpect where T: Equatable {
     assert(
       value == anotherValue,
       error: "Expected \(valueStr) to equal \(anotherValueStr)",
-      errorNegate: "Expected \(valueStr) to NOT equal \(anotherValueStr)"
+      errorNegate: "Expected \(valueStr) to not equal \(anotherValueStr)"
+    )
+  }
+}
+
+/// Extension for arrays.
+extension SSExpect where T == [Equatable] {
+  private func areEqual<X: Equatable>(_ a: T?, _ b: [X]) -> Bool {
+    guard let A = a as? [X] else { return false }
+    return A == b
+  }
+
+  private func areSame<X: Comparable>(_ a: T?, _ b: [X]) -> Bool {
+    guard let A = a as? [X] else { return false }
+    return A.sorted { $0 < $1 } == b.sorted { $0 < $1 }
+  }
+
+  private func areInclusive<X: Equatable>(_ a: T?, _ b: [X]) -> Bool {
+    guard let A = a as? [X] else { return false }
+
+    for val in b {
+      if !A.contains(val) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  public func eq<X: Equatable>(_ anotherValue: [X]) {
+    let anotherValueStr = toString(value: anotherValue)
+
+    assert(
+      areEqual(value, anotherValue),
+      error: "Expected \(valueStr) to equal \(anotherValueStr)",
+      errorNegate: "Expected \(valueStr) to not equal \(anotherValueStr)"
+    )
+  }
+
+  public func same<X: Comparable>(_ anotherValue: [X]) {
+    let anotherValueStr = toString(value: anotherValue)
+
+    assert(
+      areSame(value, anotherValue),
+      error: "Expected \(valueStr) to be the same as \(anotherValueStr)",
+      errorNegate: "Expected \(valueStr) to not be the same as \(anotherValueStr)"
+    )
+  }
+
+  public func include<X: Equatable>(_ anotherValue: [X]) {
+    let anotherValueStr = toString(value: anotherValue)
+
+    assert(
+      areInclusive(value, anotherValue),
+      error: "Expected \(valueStr) to include \(anotherValueStr)",
+      errorNegate: "Expected \(valueStr) to not include \(anotherValueStr)"
     )
   }
 }
