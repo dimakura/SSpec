@@ -15,7 +15,7 @@ class Example: Node {
   }
 
   override func runInitial() {
-    // skip
+    SSpec.currentSession.collectExampleRegistered(node: self)
   }
 
   override func runExamples() {

@@ -44,7 +44,7 @@ public class SSSession {
 
     collectors = [
       Welcomer(),
-      ProgressReporter(),
+      Reporter.createReporter(),
       TimeTaken()
     ]
   }

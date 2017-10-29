@@ -11,6 +11,7 @@
 extension SSSession {
   /// Base class for collecting session related events.
   class Collector {
+    func exampleRegistered(node: Example) {}
     func specStarted() {}
     func contextStarted(node: Describe) {}
     func exampleSkipped(node: Example) {}
@@ -25,6 +26,10 @@ extension SSSession {
     for collector in self.collectors {
       emit(collector)
     }
+  }
+
+  func collectExampleRegistered(node: Example) {
+    emitAll { collector in collector.exampleRegistered(node: node) }
   }
 
   func collectSpecStarted() {

@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "Progress",
+        "repositoryURL": "https://github.com/jkandzi/Progress.swift",
+        "state": {
+          "branch": null,
+          "revision": "62c42a85d807f4017a506da5e3190122e2167adb",
+          "version": "0.3.0"
+        }
+      },
+      {
         "package": "Rainbow",
         "repositoryURL": "https://github.com/onevcat/Rainbow",
         "state": {
