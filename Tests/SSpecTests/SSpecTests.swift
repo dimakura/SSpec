@@ -11,20 +11,20 @@ import XCTest
 @testable import SSpec
 
 class SSpecTests: XCTestCase {
-  func testSimpleSessions() {
-    let s1 = SSS.run {
+  func testSimpleRuns() {
+    SSpec.run {
       it("wrong math") { expect(2 + 2).to.eq(5) }
     }
-    XCTAssert(s1.exampleCount == 1)
-    XCTAssert(s1.hasErrors == true)
+    XCTAssert(SSpec.exampleCount == 1)
+    XCTAssert(SSpec.hasErrors == true)
 
-    let s2 = SSS.run {
+    SSpec.run {
       it("correct math") { expect(2 + 2).to.eq(4) }
     }
-    XCTAssert(s2.exampleCount == 1)
-    XCTAssert(s2.hasErrors == false)
+    XCTAssert(SSpec.exampleCount == 1)
+    XCTAssert(SSpec.hasErrors == false)
 
-    let s3 = SSS.run {
+    SSpec.run {
       describe("Arithmetics") {
         context("addition") {
           it("2 + 2 = 4") {
@@ -38,12 +38,12 @@ class SSpecTests: XCTestCase {
         }
       }
     }
-    XCTAssert(s3.exampleCount == 2)
-    XCTAssert(s3.hasErrors == false)
+    XCTAssert(SSpec.exampleCount == 2)
+    XCTAssert(SSpec.hasErrors == false)
   }
 
   func testSpecs() {
-    let session = SSS.run {
+    SSpec.run {
       describe("SSpec") {
         versionSpecs()
         sessionSpecs()
@@ -57,11 +57,11 @@ class SSpecTests: XCTestCase {
       }
     }
 
-    XCTAssert(session.hasErrors == false)
+    XCTAssert(SSpec.hasErrors == false)
   }
 
   static var allTests = [
-    ("testSimpleSessions", testSimpleSessions),
+    ("testSimpleRuns", testSimpleRuns),
     ("testSpecs", testSpecs),
   ]
 }

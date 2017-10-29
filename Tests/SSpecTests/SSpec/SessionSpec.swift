@@ -11,14 +11,14 @@
 
 func sessionSpecs() {
   context("Session") {
-    let s = SSS.currentSession
+    let s = SSpec.currentSession
 
     it("is running") {
       expect(s.mode).to.eq(SSS.Mode.Running)
     }
 
-    it("has a matcher") {
-      expect(s.matcher).to.not.beNil
+    it("doesn't have errors") {
+      expect(s.hasErrors).to.beFalse
     }
   }
 }

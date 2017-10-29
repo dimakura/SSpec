@@ -8,7 +8,7 @@
 //
 
 struct Version: CustomStringConvertible {
-  static let currentVersion: Version = Version(major: 0, minor: 1, patch: 0)
+  static let currentVersion: Version = Version(major: 0, minor: 1, patch: 2)
 
   let major: Int
   let minor: Int

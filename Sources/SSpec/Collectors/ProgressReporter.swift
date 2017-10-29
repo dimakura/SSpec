@@ -12,7 +12,7 @@ import Rainbow
 /// Progress reporter.
 class ProgressReporter: SSSession.Collector {
   private var exampleFailures: Int = 0
-  private var currentExample: ExampleNode?
+  private var currentExample: Example?
   private var exampleTitles = [Int: String]()
   private var errorsByExample = [Int: [String]]()
 
@@ -20,16 +20,16 @@ class ProgressReporter: SSSession.Collector {
   var skipes:   Int = 0
   var failures: Int { return errorsByExample.count }
 
-  override func contextStarted(node: DescribeNode) {
+  override func contextStarted(node: Describe) {
     log(node.title.bold, level: node.level)
   }
 
-  override func exampleSkipped(node: ExampleNode) {
+  override func exampleSkipped(node: Example) {
     skipes += 1
     log("\u{2022} \(node.title)".yellow, level: node.level)
   }
 
-  override func exampleStarted(node: ExampleNode) {
+  override func exampleStarted(node: Example) {
     examples += 1
     currentExample = node
     exampleFailures = 0
@@ -49,7 +49,7 @@ class ProgressReporter: SSSession.Collector {
     }
   }
 
-  override func exampleEnded(node: ExampleNode) {
+  override func exampleEnded(node: Example) {
     if exampleFailures > 0 {
       log("\u{2717} \(node.title)".red, level: node.level)
     } else {

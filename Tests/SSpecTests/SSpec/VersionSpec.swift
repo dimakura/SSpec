@@ -13,8 +13,8 @@ func versionSpecs() {
   describe("Version") {
     let v = Version.currentVersion
 
-    it("is 0.1.0") {
-      expect(v.description).to.eq("0.1.0")
+    it("is 0.1.2") {
+      expect(v.description).to.eq("0.1.2")
     }
   }
 }

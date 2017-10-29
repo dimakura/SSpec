@@ -48,9 +48,9 @@ public class SSExpect<T> {
   /// Assert if given relation is true.
   func assert(_ value: Bool, error: String, errorNegate: String? = nil) {
     if negate && value {
-      SSS.currentSession.collectExampleError(error: errorNegate ?? error)
+      SSpec.currentSession.collectExampleError(error: errorNegate ?? error)
     } else if !negate && !value {
-      SSS.currentSession.collectExampleError(error: error)
+      SSpec.currentSession.collectExampleError(error: error)
     }
   }
 
