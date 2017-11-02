@@ -54,6 +54,8 @@ class SSpecTests: XCTestCase {
         stringSpecs()
         equatableSpecs()
         arraySpecs()
+        beforeSpecs()
+        afterSpecs()
       }
     }
 

@@ -14,8 +14,8 @@ public class SSSession {
     /// Mode when we build execution tree.
     case Initializing
 
-    /// Mode when examples are run.
-    case Running
+    /// Mode when tests are executed.
+    case Testing
   }
 
   /// Current node.
@@ -71,8 +71,8 @@ public class SSSession {
   }
 
   private func execRunningMode(runnable: SSRunnable) {
-    _mode = .Running
-    _currentNode.runExamples()
+    _mode = .Testing
+    _currentNode.runTesting()
   }
 }
 

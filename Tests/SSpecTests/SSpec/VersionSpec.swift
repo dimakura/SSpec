@@ -10,11 +10,13 @@
 @testable import SSpec
 
 func versionSpecs() {
-  describe("Version") {
+  let expectedVersion = "0.2.0"
+
+  describe("Latest version") {
     let v = Version.currentVersion
 
-    it("is 0.1.3") {
-      expect(v.description).to.eq("0.1.3")
+    it("is \(expectedVersion)") {
+      expect(v.description).to.eq(expectedVersion)
     }
   }
 }

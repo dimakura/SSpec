@@ -33,6 +33,12 @@ class Node {
   /// Child nodes.
   var children: [Node]
 
+  /// Children which are run before everything else.
+  var preChildren: [Node]
+
+  /// Children which are run after everything else.
+  var postChildren: [Node]
+
   /// Creates node.
   init(title: String, parent: Node? = nil, runnable: SSRunnable? = nil) {
     self.id = IdGenerator.nextId
@@ -41,20 +47,61 @@ class Node {
     self.title = title
     self.runnable = runnable
     self.children = [Node]()
+    self.preChildren = [Node]()
+    self.postChildren = [Node]()
+
+    if let par = parent { par.children.append(self) }
   }
 
-  func runInitial() {
-    fatalError("Each subclass should implement #runInitial.")
+  /// Execute some code in some id's context.
+  func withId(_ id: Int? = nil, _ runnable: SSRunnable?) {
+    let previoudId = Node.currentId
+    Node.currentId = id ?? self.id
+    if let run = runnable {
+      run()
+    }
+    Node.currentId = previoudId
   }
 
-  func runExamples() {
-    fatalError("Each subclass should implement #runExamples.")
+  /// If this node is current one?
+  func isCurrentNode() -> Bool {
+    return self.id == Node.currentId
   }
 
+  /// Full title of the node.
   var fullTitle: String {
     if let parent = self.parent {
       return parent.isRoot ? title : "\(parent.fullTitle) \(title)"
     }
     return title
+  }
+
+  /// This method runs during initialization.
+  func runInitialization() {}
+
+  /// This method runs during test mode.
+  func runTesting() {}
+
+  /// Standard code for executing child nodes.
+  func runChildNodes() {
+    func runPres() {
+      for pre in self.preChildren {
+        pre.runTesting()
+      }
+    }
+
+    func runPosts() {
+      for post in self.postChildren {
+        post.runTesting()
+      }
+    }
+
+    for child in self.children {
+      withId(child.id) {
+        runPres()
+        child.runTesting()
+        runPosts()
+      }
+    }
   }
 }

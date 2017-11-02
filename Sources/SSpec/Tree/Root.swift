@@ -11,17 +11,13 @@
 class Root: Node {
   override var isRoot: Bool { return true }
 
-  override func runInitial() {
+  override func runInitialization() {
     // skip
   }
 
-  override func runExamples() {
+  override func runTesting() {
     SSpec.currentSession.collectSpecStarted()
-
-    for child in children {
-      child.runExamples()
-    }
-
+    runChildNodes()
     SSpec.currentSession.collectSpecEnded()
   }
 }

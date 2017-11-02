@@ -9,17 +9,12 @@
 
 /// Example node.
 class Example: Node {
-  override init(title: String, parent: Node? = nil, runnable: SSRunnable? = nil) {
-    super.init(title: title, parent: parent, runnable: runnable)
-    if let par = parent { par.children.append(self) }
-  }
-
-  override func runInitial() {
+  override func runInitialization() {
     SSpec.currentSession.collectExampleRegistered(node: self)
   }
 
-  override func runExamples() {
-    guard canRunExample() else { return }
+  override func runTesting() {
+    guard isCurrentNode() else { return }
 
     if let run = runnable {
       SSpec.currentSession.collectExampleStarted(node: self)
@@ -28,12 +23,5 @@ class Example: Node {
     } else {
       SSpec.currentSession.collectExampleSkipped(node: self)
     }
-  }
-
-  private func canRunExample() -> Bool {
-    if self.id == Node.currentId { return true }
-    if let parent = self.parent, parent.isRoot { return true }
-
-    return false
   }
 }
