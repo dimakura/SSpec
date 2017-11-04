@@ -1,12 +1,3 @@
-//
-// SSpec
-// Events.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-21
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
 /// Event relates extensions.
 extension SSSession {
   /// Base class for collecting session related events.

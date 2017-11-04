@@ -1,12 +1,3 @@
-//
-// SSpec
-// Example.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-29
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
 /// Example node.
 class Example: Node {
   override func runInitialization() {
@@ -14,7 +5,7 @@ class Example: Node {
   }
 
   override func runTesting() {
-    guard isCurrentNode() else { return }
+    guard isCurrentNode else { return }
 
     if let run = runnable {
       SSpec.currentSession.collectExampleStarted(node: self)

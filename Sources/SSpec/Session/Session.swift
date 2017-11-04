@@ -1,12 +1,3 @@
-//
-// SSpec
-// Session.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-21
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
 /// Interface for running specs.
 public class SSSession {
   /// Session mode.

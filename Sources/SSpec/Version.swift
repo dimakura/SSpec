@@ -1,15 +1,5 @@
-//
-// SSpec
-// Version.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-21
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
+/// Version struct.
 struct Version: CustomStringConvertible {
-  static let currentVersion: Version = Version(major: 0, minor: 2, patch: 0)
-
   let major: Int
   let minor: Int
   let patch: Int

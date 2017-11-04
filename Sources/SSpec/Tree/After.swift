@@ -1,12 +1,3 @@
-//
-// SSpec
-// After.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-29
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
 /// After node.
 class After: Node {
   override func runInitialization() {
@@ -16,7 +7,7 @@ class After: Node {
   }
 
   override func runTesting() {
-    if isCurrentNode() { return }
+    if isCurrentNode { return }
     if let run = runnable { run() }
   }
 }

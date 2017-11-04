@@ -1,12 +1,3 @@
-//
-// SSpec
-// BeforeAfterSpec.swift
-//
-// Created by Dimitri Kurashvili on 2017-11-01
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
 import SSpec
 
 func beforeSpecs() {

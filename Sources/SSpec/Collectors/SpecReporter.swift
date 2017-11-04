@@ -1,12 +1,3 @@
-//
-// SSpec
-// SpecReporter.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-24
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
 import Rainbow
 
 /// Spec-style reporter.

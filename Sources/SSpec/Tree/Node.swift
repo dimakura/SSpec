@@ -1,16 +1,12 @@
-//
-// SSpec
-// Node.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-21
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
+/// Node for specs tree.
+class Node: Equatable {
+  /// Current node: used for running examples.
+  static var current: Node? = nil
 
-/// Execution node for specs tree.
-class Node {
-  /// When we run spec, we store id of the current example in this variable.
-  static var currentId: Int = -1
+  /// Equatable implementation.
+  static func ==(lhs: Node, rhs: Node) -> Bool {
+    return lhs.id == rhs.id
+  }
 
   /// Unique identificator of this node.
   let id: Int
@@ -53,19 +49,19 @@ class Node {
     if let par = parent { par.children.append(self) }
   }
 
-  /// Execute some code in some id's context.
-  func withId(_ id: Int? = nil, _ runnable: SSRunnable?) {
-    let previoudId = Node.currentId
-    Node.currentId = id ?? self.id
+  /// Execute some code in node's context.
+  func with(_ node: Node? = nil, _ runnable: SSRunnable?) {
+    let previous = Node.current
+    Node.current = node ?? self
     if let run = runnable {
       run()
     }
-    Node.currentId = previoudId
+    Node.current = previous
   }
 
   /// If this node is current one?
-  func isCurrentNode() -> Bool {
-    return self.id == Node.currentId
+  var isCurrentNode: Bool {
+    return self == Node.current
   }
 
   /// Full title of the node.
@@ -74,6 +70,39 @@ class Node {
       return parent.isRoot ? title : "\(parent.fullTitle) \(title)"
     }
     return title
+  }
+
+  /// Collects preChildren from parent and adds self preChildren.
+  func allPreChildren() -> [Node] {
+    var pres = [Node]()
+
+    if let par = parent {
+      for pre in par.allPreChildren() {
+        pres.append(pre)
+      }
+    }
+
+    for pre in self.preChildren {
+      pres.append(pre)
+    }
+
+    return pres
+  }
+
+  func allPostChildren() -> [Node] {
+    var posts = [Node]()
+
+    for post in self.postChildren {
+      posts.append(post)
+    }
+
+    if let par = parent {
+      for post in par.allPostChildren() {
+        posts.append(post)
+      }
+    }
+
+    return posts
   }
 
   /// This method runs during initialization.
@@ -85,19 +114,19 @@ class Node {
   /// Standard code for executing child nodes.
   func runChildNodes() {
     func runPres() {
-      for pre in self.preChildren {
+      for pre in allPreChildren() {
         pre.runTesting()
       }
     }
 
     func runPosts() {
-      for post in self.postChildren {
+      for post in allPostChildren() {
         post.runTesting()
       }
     }
 
     for child in self.children {
-      withId(child.id) {
+      with(child) {
         runPres()
         child.runTesting()
         runPosts()

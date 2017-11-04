@@ -1,12 +1,4 @@
-//
-// SSpec
-// Tree.swift
-//
-// Created by Dimitri Kurashvili on 2017-11-01
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
+/// Tree builder extension.
 extension SSSession {
   /// Build description node/
   func describe(_ title: String, _ runnable: SSRunnable?) {

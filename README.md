@@ -40,7 +40,7 @@ To use SSpec in your code, just import it:
 import SSpec
 ```
 
-## Simple example
+## Getting started
 
 You can easily understand a lot about SSpec looking at this simple example:
 
@@ -87,17 +87,155 @@ XCTAssert(SSpec.hasErrors == false)
 This is not strictly necessary. But in cases when your CI relies on XCTest's
 failure, it's a handy way to detect errors.
 
-## Describe and context
+## Grouping tests
+
+Two global functions `describe` and `context` are helpful for grouping similar
+tests. They are also a nice way to document your code.
+
+```swift
+SSpec.run {
+  describe("Person") {
+    context("with high salary") {
+      let person = Person(salary: .High)
+
+      it("is rich") {
+        expect(person.isRich).to.beTrue
+      }
+    }
+
+    context("with low salary") {
+      let person = Person(salary: .Low)
+
+      it("is not rich") {
+        expect(person.isRich).to.beFalse
+      }
+
+      it("is poor") {
+        expect(person.isPoor).to.beTrue
+      }
+    }
+  }
+}
+```
+
+You can use `describe` and `context` interchangeably.
+As a rule programmers use `describe` for grouping examples at high-level,
+splitting them down to more detailed examples with `context`s.
+
+## Hooks
+
+If several tests use shared variables or need the same initialization code,
+you can conveniently use before hook. Before hook runs before each test.
+
+If you need to cleanup after running each test you can do this using after hook.
+
+```swift
+describe("Event") {
+  var event = Event()
+
+  before {
+    // This code runs before each example
+    event.dueDate = tomorrow()
+    event.priority = .High
+    event.save()
+  }
+
+  it("is urgent") {
+    expect(event.urgent).to.beTrue
+  }
+
+  it("is 1 day away") {
+    expect(event.daysLeft).to.eq(1)
+  }
+
+  after {
+    // This code runs after each example
+    Database.clean()
+  }
+}
+```
+
+Note that if there are before hooks at different levels, they all get executed
+starting from top-level. For after hook execution starts with the lowest level.
+
+```swift
+describe("Level 1") {
+  before {
+    // this runs first
+  }
+
+  context("Level 2") {
+    before {
+      // this runs second
+    }
+
+    it("Example") {
+      // this runs after two before hooks
+    }
+
+    after {
+      // this runs first after the "Example"
+    }
+  }
+
+  after {
+    // this runs last
+  }
+}
+```
+
+## Matchers
+
+### General matcher
+
+All values can be tested on presence with `beNil` matcher:
+
+```swift
+it("is nil") {
+  expect(value).to.beNil
+}
+```
+
+### Bool matchers
+
+To test boolean values, use `beTrue` and `beFalse` matchers:
+
+```swift
+it("is true") {
+  expect(true).to.beTrue
+}
+it("is false") {
+  expect(false).to.beFalse
+}
+````
+
+### Equatable matchers
 
 TODO:
 
-## Matchers
+### String matchers
+
+TODO:
+
+### Array matchers
+
+TODO:
+
+## Change matchers
+
+TODO:
+
+## Custom matchers
 
 TODO:
 
 ## Configuration
 
-By default SSpec reports progress with dots, there are other options available:
+### Reporter
+
+By default SSpec reports progress with dots.
+
+There are other options available:
 
 ```swift
 SSpec.reporter = .Dot        // default reporter

@@ -1,12 +1,3 @@
-//
-// SSpec
-// ArraySpec.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-27
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
 import SSpec
 
 func arraySpecs() {

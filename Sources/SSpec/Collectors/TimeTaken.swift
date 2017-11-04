@@ -1,12 +1,3 @@
-//
-// SSpec
-// TimeTaken.swift
-//
-// Created by Dimitri Kurashvili on 2017-10-22
-//
-// Copyright (c) 2017 Dimitri Kurashvili. All rights reserved
-//
-
 import Foundation
 
 fileprivate func normalDuration(_ rawDuration: Double) -> (Double, String) {
