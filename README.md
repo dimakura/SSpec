@@ -14,7 +14,7 @@ who never worked with any BDD frameworks before.
 Add SSpec as package dependency in your project's `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/dimakura/SSpec", from: "0.1.3")
+.package(url: "https://github.com/dimakura/SSpec", from: "0.2.2")
 ```
 
 You should also put it under test target's dependencies:

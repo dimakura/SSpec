@@ -19,6 +19,7 @@ public class SSSession {
   private var _mode: Mode?
   private var _hasErrors: Bool = false
   private var _exampleCount: Int = 0
+  private var _focused: Set<Node>
 
   /// Session mode.
   var mode: Mode { return _mode! }
@@ -32,7 +33,7 @@ public class SSSession {
   /// Create session.
   init() {
     _currentNode = Root(title: "ROOT")
-
+    _focused = Set<Node>()
     collectors = [
       Welcomer(),
       Reporter.createReporter(),
@@ -45,9 +46,24 @@ public class SSSession {
     _hasErrors = true
   }
 
-  /// Incremenet examples count for current session.
+  /// Incremenet examples count.
   func incExamples() {
     _exampleCount += 1
+  }
+
+  /// Register focused example.
+  func addFocused(_ node: Node) {
+    _focused = _focused.union(node.chain)
+  }
+
+  /// Is given node focused?
+  /// This method returns true if there are no focused specs.
+  func isFocused(_ node: Node) -> Bool {
+    if _focused.isEmpty {
+      return true
+    }
+
+    return _focused.contains(node)
   }
 
   /// Execute session.

@@ -1,9 +1,16 @@
 /// Tree builder extension.
 extension SSSession {
-  /// Build description node/
+  /// Build description node.
   func describe(_ title: String, _ runnable: SSRunnable?) {
     buildTree {
       return Describe(title: title, parent: _currentNode, runnable: runnable)
+    }
+  }
+
+  /// Build focused description node.
+  func fdescribe(_ title: String, _ runnable: SSRunnable?) {
+    buildTree {
+      return Describe(title: title, parent: _currentNode, runnable: runnable, focused: true)
     }
   }
 
@@ -11,6 +18,13 @@ extension SSSession {
   func it(_ title: String, _ runnable: SSRunnable?) {
     buildTree {
       return Example(title: title, parent: _currentNode, runnable: runnable)
+    }
+  }
+
+  /// Build focused example node.
+  func fit(_ title: String, _ runnable: SSRunnable?) {
+    buildTree {
+      return Example(title: title, parent: _currentNode, runnable: runnable, focused: true)
     }
   }
 

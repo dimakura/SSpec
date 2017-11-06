@@ -1,5 +1,5 @@
 /// Node for specs tree.
-class Node: Equatable {
+class Node: Equatable, Hashable {
   /// Current node: used for running examples.
   static var current: Node? = nil
 
@@ -11,11 +11,11 @@ class Node: Equatable {
   /// Unique identificator of this node.
   let id: Int
 
+  /// Is this example focused?
+  let focused: Bool
+
   /// Parent node.
   let parent: Node?
-
-  /// Level starts with `-1` for root node and goes up each new level.
-  let level: Int
 
   /// Description of the node.
   let title: String
@@ -27,26 +27,30 @@ class Node: Equatable {
   var isRoot: Bool { return false }
 
   /// Child nodes.
-  var children: [Node]
+  var children = [Node]()
 
   /// Children which are run before everything else.
-  var preChildren: [Node]
+  var preChildren = [Node]()
 
   /// Children which are run after everything else.
-  var postChildren: [Node]
+  var postChildren = [Node]()
 
   /// Creates node.
-  init(title: String, parent: Node? = nil, runnable: SSRunnable? = nil) {
+  init(title: String, parent: Node? = nil, runnable: SSRunnable? = nil, focused: Bool = false) {
     self.id = IdGenerator.nextId
-    self.parent = parent
-    self.level = (parent?.level ?? -2) + 1
-    self.title = title
-    self.runnable = runnable
-    self.children = [Node]()
-    self.preChildren = [Node]()
-    self.postChildren = [Node]()
 
-    if let par = parent { par.children.append(self) }
+    self.focused  = parent?.focused ?? false || focused
+    self.parent   = parent
+    self.title    = title
+    self.runnable = runnable
+
+    if let par = parent {
+      par.children.append(self)
+    }
+  }
+
+  var hashValue: Int {
+    return id
   }
 
   /// Execute some code in node's context.
@@ -64,12 +68,27 @@ class Node: Equatable {
     return self == Node.current
   }
 
+  /// Is this node focused?
+  var isFocused: Bool {
+    return SSpec.currentSession.isFocused(self)
+  }
+
   /// Full title of the node.
   var fullTitle: String {
     if let parent = self.parent {
       return parent.isRoot ? title : "\(parent.fullTitle) \(title)"
     }
+
     return title
+  }
+
+  /// Full chain from current not to the root..
+  var chain: [Node] {
+    guard let par = parent else { return [self] }
+
+    var c = par.chain
+    c.append(self)
+    return c
   }
 
   /// Collects preChildren from parent and adds self preChildren.
@@ -89,6 +108,7 @@ class Node: Equatable {
     return pres
   }
 
+  /// Adds parent prechildren to self's preChildren.
   func allPostChildren() -> [Node] {
     var posts = [Node]()
 
@@ -105,13 +125,14 @@ class Node: Equatable {
     return posts
   }
 
-  /// This method runs during initialization.
+  /// Session invokes this method during initialization mode.
   func runInitialization() {}
 
-  /// This method runs during test mode.
+  /// Session invokes this method during testing mode.
   func runTesting() {}
 
   /// Standard code for executing child nodes.
+  /// Root and context nodes both use it in testing mode.
   func runChildNodes() {
     func runPres() {
       for pre in allPreChildren() {

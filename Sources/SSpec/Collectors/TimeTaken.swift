@@ -5,7 +5,7 @@ fileprivate func normalDuration(_ rawDuration: Double) -> (Double, String) {
   var duration = rawDuration
   if (duration < 1 && duration * 1_000 > 0.3) {
     duration = duration * 1_000
-    unit = "miliseconds"
+    unit = "milliseconds"
   } else if (duration < 1 && duration * 1_000_000 > 0.3) {
     duration = duration * 1_000_000
     unit = "microseconds"

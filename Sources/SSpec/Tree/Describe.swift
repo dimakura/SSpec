@@ -6,6 +6,8 @@ class Describe: Node {
   }
 
   override func runTesting() {
+    guard isFocused else { return }
+
     SSpec.currentSession.collectContextStarted(node: self)
     runChildNodes()
     SSpec.currentSession.collectContextEnded(node: self)

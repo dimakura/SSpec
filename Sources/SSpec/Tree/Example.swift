@@ -5,7 +5,7 @@ class Example: Node {
   }
 
   override func runTesting() {
-    guard isCurrentNode else { return }
+    guard isCurrentNode && isFocused else { return }
 
     if let run = runnable {
       SSpec.currentSession.collectExampleStarted(node: self)

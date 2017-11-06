@@ -3,7 +3,7 @@ public typealias SSRunnable = () -> Void
 
 /// Main interface to interact.
 public struct SSpec {
-  static let currentVersion = Version(major: 0, minor: 2, patch: 1)
+  static let currentVersion = Version(major: 0, minor: 2, patch: 2)
 
   /// Kind of reporter.
   public enum Reporter {
@@ -53,9 +53,19 @@ public func describe(_ title: String, _ runnable: SSRunnable? = nil) {
   SSpec.currentSession.describe(title, runnable)
 }
 
+/// Focused describe function.
+public func fdescribe(_ title: String, _ runnable: SSRunnable? = nil) {
+  SSpec.currentSession.fdescribe(title, runnable)
+}
+
 /// Context function.
 public func context(_ title: String, _ runnable: SSRunnable? = nil) {
   SSpec.currentSession.describe(title, runnable)
+}
+
+/// Focused context function.
+public func fcontext(_ title: String, _ runnable: SSRunnable? = nil) {
+  SSpec.currentSession.fdescribe(title, runnable)
 }
 
 /// Before hook.
@@ -66,6 +76,11 @@ public func before(_ runnable: SSRunnable?) {
 /// Example function.
 public func it(_ title: String, _ runnable: SSRunnable? = nil) {
   SSpec.currentSession.it(title, runnable)
+}
+
+/// Focused example function.
+public func fit(_ title: String, _ runnable: SSRunnable? = nil) {
+  SSpec.currentSession.fit(title, runnable)
 }
 
 /// After hook.

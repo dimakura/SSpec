@@ -30,6 +30,8 @@ class Reporter: SSSession.Collector {
 
   func onExampleFailure(node: Example) {}
 
+  func onContextEnded(node: Describe) {}
+
   func onSpecEnded() {}
 
   func log(_ text: String, level: Int = 0) {
@@ -81,6 +83,10 @@ class Reporter: SSSession.Collector {
       onExampleSuccess(node: node)
     }
     currentExample = nil
+  }
+
+  override func contextEnded(node: Describe) {
+    onContextEnded(node: node)
   }
 
   override func specEnded() {

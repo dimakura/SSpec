@@ -20,6 +20,7 @@ extension SSSession {
   }
 
   func collectExampleRegistered(node: Example) {
+    if node.focused { addFocused(node) }
     emitAll { collector in collector.exampleRegistered(node: node) }
   }
 
