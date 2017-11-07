@@ -1,7 +1,7 @@
 @testable import SSpec
 
 func versionSpecs() {
-  let expectedVersion = "0.2.2"
+  let expectedVersion = "0.2.3"
 
   describe("Latest version") {
     let v = SSpec.currentVersion

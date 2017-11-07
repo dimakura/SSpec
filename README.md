@@ -1,9 +1,9 @@
 # SSpec
 
-SSpec is a behavior driven development (BDD) framework for Swift developers and
-it offers awesome alternative to standard XCTest.
+SSpec is a behavior driven development (BDD) framework for Swift and it offers awesome alternative
+to standard XCTest.
 
-If you worked with behavior driven development (BDD) before SSpec should be
+If you worked with behavior driven development (BDD) before, SSpec should be
 already familiar to you. And it's simple to understand and get started for those
 who never worked with any BDD frameworks before.
 
@@ -14,7 +14,7 @@ who never worked with any BDD frameworks before.
 Add SSpec as package dependency in your project's `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/dimakura/SSpec", from: "0.2.2")
+.package(url: "https://github.com/dimakura/SSpec", from: "0.2.3")
 ```
 
 You should also put it under test target's dependencies:
@@ -34,7 +34,7 @@ Package manager downloads SSpec for you during build:
 swift build
 ```
 
-To use SSpec in your code, just import it:
+Do not forget to import SSPec to use it:
 
 ```swift
 import SSpec
@@ -58,21 +58,23 @@ Standard way to run SSpec is to use `SSpec.run` method as this is done at the
 first line of our example. Inside closure for this method we define our test
 examples.
 
+
 The first (and only) test example is defined on the second line.
 It has title (`"2 + 2 = 4"`) and one more closure.
 
 Inside test example's closure at line three, you can see what this example
-actually tries to test. It makes sure that `2 + 2` is indeed equal to `4`.
+actually tries to test. It makes sure that `2 + 2` is indeed `4`.
 
 You can place as many examples inside body of `SSpec.run {...}` as needed.
+You should usually create single `SSpec.run {...}` and define all tests inside.
 SSpec runs all of the examples and checks their correctness.
-
-In case of our simple example output from running tests looks like this:
-
-![Simple Example Output](https://s1.postimg.org/3yxge26htb/Screen_Shot_2017-10-24_at_9.23.22_PM.png)
 
 If any of the example fails, SSpec will print detailed report of what went
 wrong, so you can easily locate source of the problem.
+
+Example output with default SSpec reporter looks like this:
+
+![Sample Output](https://s1.postimg.org/5rt1xb6zhb/Screen_Shot_2017-11-07_at_12.10.44_PM.png)
 
 To detect failures programmatically, you can use `SSpec.hasErrors` property,
 which is `false` by default, but becomes `true` once there's at least one
@@ -84,13 +86,13 @@ You can use this property to report failure back to `XCTest`:
 XCTAssert(SSpec.hasErrors == false)
 ```
 
-This is not strictly necessary. But in cases when your CI relies on XCTest's
-failure, it's a handy way to detect errors.
+This is not strictly necessary. But when your CI relies on XCTest's failure, it's a handy way to
+detect errors.
 
 ## Grouping tests
 
 Two global functions `describe` and `context` are helpful for grouping similar
-tests. They are also a nice way to document your code.
+tests. They are also help to document your code.
 
 ```swift
 SSpec.run {
@@ -131,12 +133,11 @@ If you need to cleanup after running each test you can do this using after hook.
 
 ```swift
 describe("Event") {
-  var event = Event()
+  var event: Event!
 
   before {
     // This code runs before each example
-    event.dueDate = tomorrow()
-    event.priority = .High
+    event = Event(priority: .High, dueDate: Date.tomorrow())
     event.save()
   }
 
@@ -164,7 +165,7 @@ describe("Level 1") {
     // this runs first
   }
 
-  context("Level 2") {
+  describe("Level 2") {
     before {
       // this runs second
     }
@@ -227,7 +228,76 @@ TODO:
 
 ## Custom matchers
 
-TODO:
+Swift is strongly typed language.
+SSpec uses types for extending matchers.
+
+Suppose you created custom class `Person`:
+
+```swift
+class Person {
+  let name: String
+  let salary: Double
+
+  init(_ name: String, _ salary: Double) {
+    self.name = name
+    self.salary = salary
+  }
+
+  var isRich: Bool {
+    return salary > 50000
+  }
+
+  var isPoor: Bool {
+    return !isRich
+  }
+}
+```
+
+and want to have your spec to like this:
+
+```swift
+describe("Person") {
+  let jack = Person("Jack", 100000)
+  let jane = Person("Jane", 20000)
+
+  describe(jack.name) {
+    it("is rich") {
+      expect(jack).to.beRich
+    }
+  }
+
+  describe(jane.name) {
+    it("is poor") {
+      expect(jane).to.bePoor
+    }
+  }
+}
+```
+
+All you need, is to extend `SSExcept<T>` class:
+
+```swift
+extension SSExpect where T == Person {
+  var beRich: Void {
+    // Note that `assert` takes into account negation status.
+    // If you need to know negation status use `isNegate` variable.
+    assert(
+      value!.isRich,                                // `value` is of type `Person?`
+      error: "Expected \(value!.name) to be rich",  // There's also standard `valueStr` variable and
+                                                    // `toString(value:)` function you can use.
+      errorNegate: "Expected \(value!.name) to be poor"
+    )
+  }
+
+  var bePoor: Void {
+    assert(
+      value!.isPoor,
+      error: "Expected \(value!.name) to be poor",
+      errorNegate: "Expected \(value!.name) to be rich"
+    )
+  }
+}
+```
 
 ## Configuration
 

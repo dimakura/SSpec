@@ -3,7 +3,7 @@ public typealias SSRunnable = () -> Void
 
 /// Main interface to interact.
 public struct SSpec {
-  static let currentVersion = Version(major: 0, minor: 2, patch: 2)
+  static let currentVersion = Version(major: 0, minor: 2, patch: 3)
 
   /// Kind of reporter.
   public enum Reporter {

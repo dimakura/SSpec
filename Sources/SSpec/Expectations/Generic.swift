@@ -1,10 +1,10 @@
 /// Base class and generic expectations.
 public class SSExpect<T> {
   /// Value to compare.
-  let value: T?
+  public let value: T?
 
   /// Value represented as a string.
-  var valueStr: String { return toString(value: value) }
+  public var valueStr: String { return toString(value: value) }
 
   /// Negate relation.
   var negate: Bool = false
@@ -12,6 +12,11 @@ public class SSExpect<T> {
   /// Create expectation.
   init(_ value: T?) {
     self.value = value
+  }
+
+  /// Is this expectation negated?
+  public var isNegate: Bool {
+    return negate
   }
 
   /// Returns self: can be useful to build readable specs.
@@ -29,17 +34,17 @@ public class SSExpect<T> {
     return self
   }
 
-  /// Toggles negation flag. Two `not` statements restore negation.
+  /// Toggles negation flag.
   public var not: SSExpect {
     negate = !negate
     return self
   }
 
   /// Assert if given relation is true.
-  func assert(_ value: Bool, error: String, errorNegate: String? = nil) {
-    if negate && value {
+  public func assert(_ value: Bool, error: String, errorNegate: String? = nil) {
+    if isNegate && value {
       SSpec.currentSession.collectExampleError(error: errorNegate ?? error)
-    } else if !negate && !value {
+    } else if !isNegate && !value {
       SSpec.currentSession.collectExampleError(error: error)
     }
   }

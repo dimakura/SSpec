@@ -39,6 +39,7 @@ class SSpecTests: XCTestCase {
         versionSpecs()
         sessionSpecs()
         nodeSpecs()
+        extensionSpec()
       }
       describe("General specs") {
         nilableSpecs()
